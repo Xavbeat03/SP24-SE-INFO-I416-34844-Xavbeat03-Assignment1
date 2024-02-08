@@ -6,7 +6,7 @@ val versionNumberClient = "0.0.1"
 val versionNumberServer = "0.0.1"
 
 val runClientArgs = "-Xms256M -Xmx512M -XX:ParallelGCThreads=2 -client -XX:CompileThreshold=1000".split(" ")
-val runServerArgs = ""//"-Xms1G -Xmx3G -XX:ParallelGCThreads=4 -XX:MaxMetaspaceSize=512M  -XX:+HeapDumpOnOutOfMemoryError -server -XX:CompileThreshold=10000 -Xlint:-deprecation".split(" ")
+val runServerArgs = "-Xms1G -Xmx3G -XX:ParallelGCThreads=4 -XX:MaxMetaspaceSize=512M  -XX:+HeapDumpOnOutOfMemoryError -server -XX:CompileThreshold=10000 -Xlint:-deprecation".split(" ")
 val compileArgs = listOf("-Werror")
 
 
@@ -67,13 +67,15 @@ tasks {
     }
 
     // Should build the client jar and run it from the cli
-    register("runClient", JavaExec::class) {
-        dependsOn(client)
+    register("runClient") {
+        dependsOn("client")
         group = "Execution"
         description = "Runs the client program"
-        mainClass = mainClassNameClient
-        classpath = sourceSets["main"].runtimeClasspath
-        jvmArgs(runClientArgs)
+        doLast {
+            exec {
+                commandLine("java", "-jar", "./build/libs/$fileNameClient-$versionNumberClient.jar", *runClientArgs.toTypedArray())
+            }
+        }
     }
 
     // Builds the Server jar
@@ -91,13 +93,15 @@ tasks {
     }
 
     // Should build the Server jar and run it from the cli
-    register("runServer", JavaExec::class) {
+    register("runServer") {
         dependsOn(server)
         group = "Execution"
         description = "Runs the server program"
-        mainClass = mainClassNameServer
-        classpath = sourceSets["main"].runtimeClasspath
-        jvmArgs(runServerArgs)
+        doLast {
+            exec {
+                commandLine("java", "-jar", "./build/libs/$fileNameServer-$versionNumberServer.jar", *runServerArgs.toTypedArray())
+            }
+        }
     }
 
     // Debugging task
