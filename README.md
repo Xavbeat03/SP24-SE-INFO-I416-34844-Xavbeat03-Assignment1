@@ -98,7 +98,7 @@ The report should have describe the design details, and some experimental evalua
 ## Grading scheme
 | Component                        | 	Weight |
 |----------------------------------|---------|
-| Basic Server                     | 	30%    |
+| Basic server                     | 	30%    |
 | Clients and testcases            | 	30%    |
 | Report                           | 	20%    |
 | Advanced: Concurrency            | 	10%    |
