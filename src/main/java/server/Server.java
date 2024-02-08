@@ -1,9 +1,9 @@
 package server;
 
-public class Server implements Runnable{
+public class Server{
 
-    @Override
-    public void run() {
-        System.out.println("Hello, this is Server.");
+    public static void main(String[] args){
+        System.out.println("Hello, this is the Server");
     }
+
 }

@@ -1,8 +1,9 @@
 package client;
 
-public class Client implements Runnable{
-    @Override
-    public void run() {
-        System.out.println("Hello, this is Client.");
+public class Client{
+
+    public static void main(String[] args){
+        System.out.println("Hello, this is the Client");
     }
+
 }
