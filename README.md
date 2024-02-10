@@ -1,5 +1,10 @@
 # SP24-SE-INFO-I416-34844-Xavbeat03-Assignment1
 
+## Building and Running
+
+To build the program clone the repo into a destination of your choosing then run ```./gradlew build``` within the project source directory. This should give you two resulting .jar files for both the client and server software.
+You can then run the .jar files as you see fit. From the repo you can also use ```./gradlew runServer``` or ```./gradlew runClient``` to build and run a specific .jar file.
+
 ## I416 Assignment 1: Memcached-lite
 
 Note: You have an extended 2 weeks of time to do this. I expect that this is an in-depth task that will take time to complete.
