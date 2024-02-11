@@ -5,7 +5,7 @@ package server;
  */
 public class Client {
 
-	static private int latestId = 0;
+	static private int latestId = -1;
 	int id = latestId;
 	Client() {
 		id = latestId++;
