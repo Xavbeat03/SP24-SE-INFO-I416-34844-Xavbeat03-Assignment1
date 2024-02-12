@@ -1,25 +1,27 @@
 package server;
 
-import java.io.BufferedInputStream;
+import server.client.Client;
+import server.client.ClientHandler;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class Server{
 
     // initialize socket and input stream
-    //TODO: Replace with server config file
     private Socket              socket      = null;
     private ServerSocket        server      = null;
 
-    private HashMap<Client, Thread> idToClientHandlerMap = new HashMap<>();
 
-    // Constructor with port
+
+     /**
+     * The main server task, creates a server on the specified port
+     * @param port the port the server is started on
+     * @throws IOException
+     */
     public Server(int port) throws IOException{
         // server is listening on port <port>
         ServerSocket s = new ServerSocket(port);
@@ -41,14 +43,15 @@ public class Server{
 
                 System.out.println("Assigning new thread for this client");
 
-                Client c = new Client();
-
                 // create a new thread object
-                Thread t = new ClientHandler(socket, dataInputStream, dataOutputStream);
+                ClientHandler t = new ClientHandler(socket, dataInputStream, dataOutputStream);
 
-                idToClientHandlerMap.put(c,t);
+                // create a new client
+                Client c = new Client(t);
 
                 t.start();
+
+                if(Client.isNoClients()){break;}
             }
             catch (Exception e)
             {
@@ -56,7 +59,6 @@ public class Server{
                 e.printStackTrace();
             }
         }
-
 
     }
     public static void main(String[] args) throws IOException {
