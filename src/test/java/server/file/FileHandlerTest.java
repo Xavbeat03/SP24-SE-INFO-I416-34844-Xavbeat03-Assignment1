@@ -19,6 +19,9 @@ public class FileHandlerTest {
 	private static final String TEST_KEY = "testKey";
 	private static final String TEST_VALUE = "testValue";
 
+	private static final String LONG_TEST_KEY = "testKeytestKeytestKeytestKeytestKeytestKeytestKeytestKeytestValuetestValue";
+	private static final String LONG_TEST_VALUE = "testValuetestValuetestValuetestValuetestValuetestValuetestValuetestValue";
+
 	private Path tempFilePath;
 
 	@BeforeEach
@@ -101,6 +104,25 @@ public class FileHandlerTest {
 	void storeValueThrowsExceptionForEmptyKeyOrValue() {
 		assertThrows(IllegalArgumentException.class, () -> FileHandler.storeValue("", "key"));
 		assertThrows(IllegalArgumentException.class, () -> FileHandler.storeValue("value", ""));
+	}
+
+	@Test
+	void storeLongValueWritesToFileWhenLongKeyNotFound() throws IOException {
+		FileHandler.storeValue(LONG_TEST_VALUE, LONG_TEST_KEY);
+
+		String[] result = FileHandler.getValue(LONG_TEST_KEY);
+
+		assertArrayEquals(new String[]{LONG_TEST_KEY, LONG_TEST_VALUE}, result);
+	}
+
+	@Test
+	void storeLongValueUpdatesValueWhenLongKeyFound() throws IOException {
+		FileHandler.storeValue(LONG_TEST_VALUE, LONG_TEST_KEY);
+		FileHandler.storeValue("newValue", LONG_TEST_KEY);
+
+		String[] result = FileHandler.getValue(LONG_TEST_KEY);
+
+		assertArrayEquals(new String[]{LONG_TEST_KEY, "newValue"}, result);
 	}
 
 

@@ -5,32 +5,62 @@ import server.client.ClientHandler;
 import server.requests.RequestFulfiller;
 import server.requests.RequestQueue;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * The Server class is responsible for creating a server on a specified port, accepting client connections, and handling client requests.
+ * It uses a RequestFulfiller to handle incoming requests and a ClientHandler to manage each client connection.
+ */
 public class Server{
 
-    // initialize socket and input stream
+    /**
+     * The socket for the client connection.
+     */
     private Socket              socket      = null;
+    /**
+     * The server socket that listens for client connections.
+     */
     private ServerSocket        server      = null;
+    /**
+     * The RequestFulfiller used to handle incoming client requests.
+     */
+    private RequestFulfiller requestFulfiller;
+    /**
+     * A flag indicating whether the server is currently running.
+     */
+    private boolean isRunning = false;
 
 
 
-     /**
-     * The main server task, creates a server on the specified port
+    /**
+     * Constructs a new Server that listens on the specified port.
+     *
      * @param port the port the server is started on
-     * @throws IOException
+     * @throws IOException if an I/O error occurs when opening the socket
      */
     public Server(int port) throws IOException{
-        // server is listening on port <port>
-        ServerSocket s = new ServerSocket(port);
+        try {
+            // server is listening on port <port>
+            server = new ServerSocket(port);
 
-        // Generate a request fulfiller so that the server can handle requests
-        RequestFulfiller requestFulfiller = new RequestFulfiller();
+            // Generate a request fulfiller so that the server can handle requests
+            requestFulfiller = new RequestFulfiller();
+        } catch (IOException i){
+            i.printStackTrace();
+        }
 
+    }
+
+    /**
+     * The main server loop. Accepts incoming client connections and handles their requests.
+     *
+     * @param s the server socket
+     * @param requestFulfiller the request fulfiller
+     * @throws IOException if an I/O error occurs when accepting a connection
+     */
+    private void run(ServerSocket s, RequestFulfiller requestFulfiller) throws IOException {
         // running infinite loop for getting
         // client request
         while (true) {
@@ -38,7 +68,13 @@ public class Server{
             try
             {
                 // socket object to receive incoming client requests
-                socket = server.accept();
+                if(!server.isClosed()) {
+                    socket = server.accept();
+                } else {
+                    return;
+                }
+
+
 
                 System.out.println("A new client is connected : " + s);
 
@@ -59,15 +95,69 @@ public class Server{
             }
             catch (Exception e)
             {
-                socket.close();
+                if(isRunning)stop();
                 e.printStackTrace();
             }
-        }
+            if(isRunning)stop();
 
+        }
     }
+
+
     public static void main(String[] args) throws IOException {
         // server is listening on port 5000
         new Server(5000);
     }
+
+    /**
+     * Starts the server. If the server is already running, throws an IllegalStateException.
+     *
+     * @throws IOException if an I/O error occurs when opening the socket
+     */
+    public synchronized void start() throws IOException {
+        if(!isRunning) {
+            isRunning = true;
+            new Thread(() -> {
+                try {
+                    run(server, requestFulfiller);
+                } catch (IOException i) {
+                    i.printStackTrace();
+                }
+            }
+            ).start();
+        } else {
+            throw new IllegalStateException("Tried to start the server while it was on.");
+        }
+    }
+
+    /**
+     * Stops the server. If the server is not running, throws an IllegalStateException.
+     *
+     * @throws IOException if an I/O error occurs when closing the socket
+     */
+    public synchronized void stop() throws IOException {
+        if(isRunning) {
+            if (socket != null) {
+                socket.close();
+            }
+            if (server != null) {
+                server.close();
+            }
+            isRunning = false;
+        } else {
+            throw new IllegalStateException("Server cannot be stopped before its started.");
+        }
+    }
+
+    /**
+     * Checks whether the server is currently running.
+     *
+     * @return true if the server is running, false otherwise
+     */
+    public boolean isRunning(){
+        return isRunning;
+    }
+
+
 
 }
