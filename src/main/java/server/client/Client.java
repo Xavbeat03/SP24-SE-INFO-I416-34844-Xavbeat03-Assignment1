@@ -26,6 +26,7 @@ public class Client {
 		this.clientHandler = clientHandler1;
 		this.id = latestId++;
 		clientMap.put(this.id, this);
+		clientHandler1.setClient(this);
 	}
 
 	/**

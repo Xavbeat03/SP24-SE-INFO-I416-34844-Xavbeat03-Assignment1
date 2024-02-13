@@ -14,11 +14,11 @@ public class GetRequest extends Request{
 	/**
 	 * Constructs a new GetRequest with the given key and client ID.
 	 *
-	 * @param k the key
+	 * @param key1 the key
 	 * @param clientId the client ID
 	 */
-	public GetRequest(String k, int clientId){
-		this.key = k;
+	public GetRequest(String key1, int clientId){
+		this.key = key1;
 		this.clientId = clientId;
 	}
 
