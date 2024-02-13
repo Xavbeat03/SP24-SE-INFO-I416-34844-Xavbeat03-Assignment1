@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class Client {
 
-	private static final Map<Integer, Client> clientMap = new HashMap<>();
+	private static Map<Integer, Client> clientMap = new HashMap<>();
 	private static int latestId = 0;
 	private int id = latestId;
 	private final ClientHandler clientHandler;
@@ -59,4 +59,9 @@ public class Client {
 	 * @return true if no clients, false otherwise
 	 */
 	public static boolean isNoClients(){return Client.clientMap.isEmpty();}
+
+	/**
+	 * Clears the ClientMap, mainly intended for testing
+	 */
+	public static void clearClientMap(){Client.clientMap = new HashMap<>();}
 }

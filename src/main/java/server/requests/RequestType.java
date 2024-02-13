@@ -13,7 +13,7 @@ public enum RequestType {
 	 */
 	GET(
 		"GET",
-		"get [a-zA-Z]{1,99} \r\n"
+		"get [a-zA-Z0-9_]{1,99} \\r\\n"
 	),
 
 	/**
@@ -21,7 +21,7 @@ public enum RequestType {
 	 */
 	SET(
 		"SET",
-		"set [a-zA-Z]{1,99} [0-9]{1,2} \r\n[a-zA-Z]{1,99} \r\n"
+		"set [a-zA-Z0-9_]{1,99} [0-9]{1,3} \\r\\n[a-zA-Z0-9_]{1,99} \\r\\n"
 	);
 
 	// The name of the request type
@@ -80,7 +80,7 @@ public enum RequestType {
 	 * @return true if the string matches the regex, false otherwise
 	 */
 	public static boolean checkIfStringMatchesRegex(String s, RequestType requestType){
-		Pattern pattern = Pattern.compile(requestType.regexPattern, Pattern.CASE_INSENSITIVE);
+		Pattern pattern = Pattern.compile(requestType.regexPattern, Pattern.MULTILINE + Pattern.UNICODE_CASE);
 		Matcher matcher = pattern.matcher(s);
 		return matcher.find();
 	}

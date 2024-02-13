@@ -1,5 +1,7 @@
 package server.requests;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Class representing a get request in the server-client architecture.
  * A get request is used to retrieve a value associated with a key.
@@ -20,6 +22,7 @@ public class GetRequest extends Request{
 	public GetRequest(String key1, int clientId){
 		this.key = key1;
 		this.clientId = clientId;
+		if(key1.isEmpty()) throw new IllegalArgumentException("Key cannot be empty.");
 	}
 
 
@@ -37,4 +40,11 @@ public class GetRequest extends Request{
 	public RequestType getRequestType(){
 		return requestType;
 	}
+
+	@Override
+	public int compareTo(@NotNull Request request) {
+		return 0;
+	}
+
+
 }

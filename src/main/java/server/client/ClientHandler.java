@@ -100,6 +100,7 @@ public class ClientHandler extends Thread{
 
 	/**
 	 * Outputs a message via the Filewriter
+	 *
 	 * @param s the string to be outputted
 	 */
 	public void outputMessage(String s){

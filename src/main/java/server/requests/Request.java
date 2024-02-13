@@ -4,7 +4,7 @@ package server.requests;
  * Abstract class representing a request in the server-client architecture.
  * Each request has a key, a client ID, and a request type.
  */
-public abstract class Request {
+public abstract class Request implements Comparable<Request>{
 	/**
 	 * Returns the key associated with this request.
 	 *

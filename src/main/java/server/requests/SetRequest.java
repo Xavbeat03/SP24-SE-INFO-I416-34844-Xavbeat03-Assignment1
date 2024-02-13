@@ -1,5 +1,7 @@
 package server.requests;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Class representing a set request in the server-client architecture.
  * A set request is used to set a value associated with a key.
@@ -22,12 +24,14 @@ public class SetRequest extends Request{
 	 * @param clientId the client ID
 	 * @param vSB the value size in bytes
 	 * @param v the value
+	 * @throws IllegalArgumentException when String or Value are empty
 	 */
 	public SetRequest(String k, int clientId, int vSB, String v){
 		this.key = k;
 		this.clientId = clientId;
 		this.valueSizeBytes = vSB;
 		this.value = v;
+		if(k.isEmpty() || v.isEmpty()) throw new IllegalArgumentException("String or Value were empty");
 	}
 
 	/**
@@ -61,5 +65,10 @@ public class SetRequest extends Request{
 	@Override
 	public RequestType getRequestType(){
 		return requestType;
+	}
+
+	@Override
+	public int compareTo(@NotNull Request request) {
+		return 0;
 	}
 }

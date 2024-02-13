@@ -14,18 +14,28 @@ plugins {
     kotlin("jvm")
     `java-library`
     java
-    jacoco
     id("com.github.johnrengelman.shadow") version "7.1.2"
+    jacoco
 }
 
 repositories {
     mavenCentral()
 }
 
+dependencies {
+    implementation("org.junit.jupiter:junit-jupiter:5.8.2")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.10.0")
+}
+
 // Java version 17
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+jacoco {
+    toolVersion = "0.8.7" // specify the JaCoCo version
+    reportsDirectory = file("${layout.buildDirectory}/customJacocoReportDir")
 }
 
 tasks.withType<ProcessResources>{
@@ -39,6 +49,11 @@ sourceSets {
         }
         kotlin {
             srcDir("src/main/kotlin")
+        }
+    }
+    test {
+        java {
+            srcDirs("src/test/java")
         }
     }
 }
@@ -116,6 +131,19 @@ tasks {
         enabled = false
     }
 
+    test {
+        useJUnitPlatform()
+        finalizedBy("jacocoTestReport") // specify that the jacocoTestReport task should be run after the test task
+    }
+
+    jacocoTestReport {
+        dependsOn(test)
+        reports {
+            xml.required = true
+            csv.required = false
+            html.required = false
+        }
+    }
 
 }
 
@@ -123,3 +151,4 @@ tasks {
 tasks.build {
     dependsOn("server", "client")
 }
+
