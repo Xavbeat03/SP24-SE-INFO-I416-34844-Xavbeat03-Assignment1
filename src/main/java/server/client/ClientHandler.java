@@ -1,24 +1,49 @@
 package server.client;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.*;
 import java.net.Socket;
 
 
 public class ClientHandler extends Thread{
 	final Socket socket;
-	final DataInputStream dis;
-	final DataOutputStream dos;
 
-	public ClientHandler(Socket clientSocket,  DataInputStream dataInputStream, DataOutputStream dataOutputStream) {
+	public ClientHandler(Socket clientSocket) {
 		this.socket = clientSocket;
-		this.dis = dataInputStream;
-		this.dos = dataOutputStream;
 	}
 
 	public void run() {
-		String recieved;
-		String toReturn;
+		PrintWriter out = null;
+		BufferedReader in = null;
+
+		try {
+			out = new PrintWriter(socket.getOutputStream(), true);
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+			while(true) {
+				String input = in.readLine();
+				if (input.equals("exit")) {
+					break;
+				}
+				if (input.equals(""))
+				out.println(input);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if (out != null) out.close();
+				if (in != null) {
+					in.close();
+					this.socket.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+
 
 
 	}

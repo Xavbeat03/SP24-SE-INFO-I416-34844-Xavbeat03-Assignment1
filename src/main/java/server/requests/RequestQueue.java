@@ -37,4 +37,11 @@ public class RequestQueue{
 	 * @return the size of the Request Queue
 	 */
 	public static synchronized int getRequestQueueLength() {return requests.size();}
+
+	/**
+	 * Returns whether the RequestQueue is empty.
+	 *
+	 * @return true if the RequestQueue is empty, false otherwise
+	 */
+	public static synchronized boolean isNoRequests() {return requests.isEmpty();}
 }
