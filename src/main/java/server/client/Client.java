@@ -64,4 +64,9 @@ public class Client {
 	 * Clears the ClientMap, mainly intended for testing
 	 */
 	public static void clearClientMap(){Client.clientMap = new HashMap<>();}
+
+	/**
+	 * Return the ClientMap
+	 */
+	public static Map<Integer, Client> getClientMap(){return clientMap;}
 }

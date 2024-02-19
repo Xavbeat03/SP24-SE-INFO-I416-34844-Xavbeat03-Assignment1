@@ -25,6 +25,7 @@ repositories {
 dependencies {
     implementation("org.junit.jupiter:junit-jupiter:5.8.2")
     testImplementation("org.mockito:mockito-junit-jupiter:5.10.0")
+    testImplementation ("org.mockito:mockito-core:3.12.4")
 }
 
 // Java version 17

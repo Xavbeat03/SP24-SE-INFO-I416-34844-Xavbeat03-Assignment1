@@ -7,7 +7,6 @@ import server.requests.SetRequest;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.PriorityQueue;
 
 import static server.requests.RequestType.GET;
 import static server.requests.RequestType.SET;
@@ -19,7 +18,7 @@ public class ClientHandler extends Thread{
 
 	PrintWriter out = null;
 
-	PriorityQueue<String> outgoingMessages = new PriorityQueue<>();
+	String latestMessage = "";
 
 	public ClientHandler(Socket clientSocket) {
 		this.socket = clientSocket;
@@ -30,12 +29,12 @@ public class ClientHandler extends Thread{
 		}
 	}
 
+
 	public void setClient(Client client) {
 		this.client = client;
 	}
 
 	public void run() {
-		PrintWriter out = null;
 		BufferedReader in = null;
 
 		try {
@@ -43,6 +42,10 @@ public class ClientHandler extends Thread{
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
 			while(true) {
+				while(!in.ready()){
+					// Wait until a line is availible to read.
+					Thread.sleep(100);
+				}
 				String input = in.readLine();
 				if (input.equals("exit")) {
 					break;
@@ -68,15 +71,15 @@ public class ClientHandler extends Thread{
 					}
 				}
 
-				while(!outgoingMessages.isEmpty()){
-					out.println(outgoingMessages.remove());
-				}
+
+
 			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		finally {
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		} finally {
 			try {
 				if (out != null) out.close();
 				if (in != null) {
@@ -104,8 +107,33 @@ public class ClientHandler extends Thread{
 	 * @param s the string to be outputted
 	 */
 	public void outputMessage(String s){
+		latestMessage = s;
 		if(out == null) return;
 		out.println(s);
 	}
 
+
+	public String getLatestMessage() {
+		return latestMessage;
+	}
+
+	/**
+	 * Mainly intended for Testing
+	 *
+	 * @param writer the Writer to be set
+	 */
+	public void setWriter(PrintWriter writer) {
+		this.out = writer;
+	}
+
+	public boolean isClientDisconnected() {
+		try {
+			PrintWriter out1 = new PrintWriter(socket.getOutputStream(), true);
+			// Try to send a ping message to the client
+			out1.println("PING");
+			return false;
+		} catch (IOException i){
+			return true;
+		}
+	}
 }

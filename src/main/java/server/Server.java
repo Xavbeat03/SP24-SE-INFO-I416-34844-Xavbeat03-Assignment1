@@ -6,8 +6,11 @@ import server.requests.RequestFulfiller;
 import server.requests.RequestQueue;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The Server class is responsible for creating a server on a specified port, accepting client connections, and handling client requests.
@@ -32,6 +35,10 @@ public class Server{
      */
     private boolean isRunning = false;
 
+    private int activeConnections = 0;
+
+    private static List<ServerSocket> serverList = new ArrayList<>();
+
 
 
     /**
@@ -42,12 +49,14 @@ public class Server{
      */
     public Server(int port) throws IOException{
         try {
-            // server is listening on port <port>
             server = new ServerSocket(port);
-
-            // Generate a request fulfiller so that the server can handle requests
+            server.setReuseAddress(true);
+            Server.serverList.add(server);
             requestFulfiller = new RequestFulfiller();
-        } catch (IOException i){
+        } catch (BindException b) {
+            System.out.println("Port " + port + " is already in use. Please use a different port or ensure no other instances of the server are running.");
+            System.exit(1);
+        } catch (IOException i) {
             i.printStackTrace();
         }
 
@@ -68,37 +77,46 @@ public class Server{
             try
             {
                 // socket object to receive incoming client requests
-                if(!server.isClosed()) {
+                if(server != null && !server.isClosed()) {
                     socket = server.accept();
+                    activeConnections++;
+
+                    System.out.println("A new client is connected : " + s);
+                    System.out.println("Assigning new thread for this client");
+
+                    // create a new thread object
+                    ClientHandler t = new ClientHandler(socket);
+                    // create a new client
+                    Client c = new Client(t);
+
+                    t.start();
+
+                    // start handling requests
+                    if(!RequestQueue.isNoRequests()) requestFulfiller.start();
+
+                    // Decrement the active connections counter when a client disconnects
+                    for(Client client : Client.getClientMap().values()) {
+                        if (client == null) continue;
+                        if(client.getClientHandler().isClientDisconnected()){
+                            Client.getClientMap().put(client.getId(), null);
+                            activeConnections--;
+                        }
+                    }
+
+                    if (activeConnections == 0) {
+                        //stop();
+                    }
+
                 } else {
                     return;
                 }
 
-
-
-                System.out.println("A new client is connected : " + s);
-
-                System.out.println("Assigning new thread for this client");
-
-                // create a new thread object
-                ClientHandler t = new ClientHandler(socket);
-
-                // create a new client
-                Client c = new Client(t);
-
-                t.start();
-
-                // start handling requests
-                if(!RequestQueue.isNoRequests()) requestFulfiller.start();
-
-                if(Client.isNoClients()){break;}
             }
             catch (Exception e)
             {
                 if(isRunning)stop();
                 e.printStackTrace();
             }
-            if(isRunning)stop();
 
         }
     }
@@ -106,7 +124,7 @@ public class Server{
 
     public static void main(String[] args) throws IOException {
         // server is listening on port 5000
-        new Server(5000);
+        new Server(5532);
     }
 
     /**

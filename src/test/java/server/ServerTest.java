@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -16,7 +18,7 @@ public class ServerTest {
 
 	@BeforeEach
 	public void setUp() throws IOException {
-		server = new Server(8080);
+		server = new Server(5532);
 	}
 
 	@AfterEach
@@ -84,6 +86,7 @@ public class ServerTest {
 		Assertions.assertFalse(server.isRunning(), "Server should not be running after stop");
 	}
 
+
 	@Test
 	public void serverCanStartAndStopMultipleTimes() {
 		try {
@@ -104,14 +107,35 @@ public class ServerTest {
 			server.start();
 			Assertions.assertTrue(server.isRunning());
 
+			List<Client> list = new ArrayList<>();
+			for(int i = 0; i < 5; i++) list.add(i, new Client("localhost", 5532));
+
 			// Create multiple clients and connect them to the server
-			for (int i = 0; i < 5; i++) {
+			for (Client c: list) {
 				// You would need to implement a Client class for this
-				Client client = new Client("localhost", 8080);
-				client.connect();
-				Assertions.assertTrue(client.isConnected());
+				c.connect();
+				Assertions.assertTrue(c.isConnected());
 			}
 
+			server.stop();
+			Assertions.assertFalse(server.isRunning());
+		} catch (IOException e) {
+			Assertions.fail();
+		}
+	}
+
+	@Test
+	public void serverCanHandleOneClient() {
+		try {
+			server.start();
+			Assertions.assertTrue(server.isRunning());
+
+			// Create a client and connect it to the server
+			Client client = new Client("localhost", 5532);
+			client.connect();
+			Assertions.assertTrue(client.isConnected());
+
+			client.disconnect();
 			server.stop();
 			Assertions.assertFalse(server.isRunning());
 		} catch (IOException e) {
@@ -126,7 +150,7 @@ public class ServerTest {
 			Assertions.assertTrue(server.isRunning());
 
 			// Create a client and connect it to the server
-			Client client = new Client("localhost", 8080);
+			Client client = new Client("localhost", 5000);
 			client.connect();
 			Assertions.assertTrue(client.isConnected());
 
@@ -148,7 +172,7 @@ public class ServerTest {
 			Assertions.assertTrue(server.isRunning());
 
 			// Create a client, connect it to the server, and send an invalid request
-			Client client = new Client("localhost", 8080);
+			Client client = new Client("localhost", 5000);
 			client.connect();
 			Assertions.assertTrue(client.isConnected());
 			client.sendRequest("INVALID REQUEST");
@@ -162,4 +186,5 @@ public class ServerTest {
 			Assertions.fail();
 		}
 	}
+
 }
