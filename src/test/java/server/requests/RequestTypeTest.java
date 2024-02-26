@@ -38,4 +38,10 @@ public class RequestTypeTest {
 		assertFalse(RequestType.checkIfStringMatchesRegex("get key1", RequestType.GET));
 		assertFalse(RequestType.checkIfStringMatchesRegex("set key1 1 value1", RequestType.SET));
 	}
+
+	@Test
+	void shouldCheckIfStringMatchesRegex1() {
+		assertTrue(RequestType.checkIfStringMatchesRegex("set key 5 \r\n" +
+			"value \r\n", RequestType.SET));
+	}
 }

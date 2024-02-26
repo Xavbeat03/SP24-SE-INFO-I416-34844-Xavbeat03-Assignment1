@@ -14,6 +14,8 @@ public class ClientHandlerTest {
 	private ClientHandler clientHandler;
 	private PrintWriter mockWriter;
 	private ByteArrayOutputStream mockOutputStream;
+
+	private BufferedReader mockReader;
 	private Socket mockSocket;
 
 	@BeforeEach
@@ -21,13 +23,18 @@ public class ClientHandlerTest {
 		mockSocket = Mockito.mock(Socket.class);
 		mockOutputStream = new ByteArrayOutputStream();
 		Mockito.when(mockSocket.getOutputStream()).thenReturn(mockOutputStream);
-		BufferedReader mockReader = Mockito.mock(BufferedReader.class);
+		mockReader = Mockito.mock(BufferedReader.class);
 		Mockito.when(mockReader.ready()).thenReturn(true); // Simulate that the input is ready
-		Mockito.when(mockReader.readLine()).thenReturn(""); // Return an empty string when readLine() is called
 		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(new byte[0]));
 		mockWriter = new PrintWriter(mockOutputStream, true);
 		clientHandler = new ClientHandler(mockSocket);
+		clientHandler.setClient(new Client(clientHandler));
 		clientHandler.setWriter(mockWriter);
+	}
+
+	@Test
+	public void setsSocketSuccessfully() {
+		assertEquals(clientHandler.getSocket(), mockSocket);
 	}
 
 	@Test
@@ -48,13 +55,14 @@ public class ClientHandlerTest {
 	public void setsClientSuccessfully() {
 		Client mockClient = Mockito.mock(Client.class);
 		clientHandler.setClient(mockClient);
+		assertEquals(mockClient, clientHandler.getClient());
 		// No exception means success
 	}
 
 	@Test
 	public void handlesSetRequestCorrectly() throws IOException {
-		String input = "SET key 0 5\r\nvalue\r\n";
-		BufferedReader mockReader = new BufferedReader(new StringReader(input));
+		String input = "set key 5\r\nvalue\r\n";
+		mockReader = new BufferedReader(new StringReader(input));
 		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(input.getBytes()));
 		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
 		clientHandler.run();
@@ -63,18 +71,21 @@ public class ClientHandlerTest {
 
 	@Test
 	public void handlesGetRequestCorrectly() throws IOException {
-		String input = "GET key\r\n";
+		String input = "get key \r\n";
 		BufferedReader mockReader = new BufferedReader(new StringReader(input));
 		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(input.getBytes()));
 		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
 		clientHandler.run();
-		assertEquals("VALUE key 5 \r\nvalue\r\nEND\r\n", mockOutputStream.toString());
+		assertEquals("value key 5 \r\nvalue\r\nEND\r\n", mockOutputStream.toString());
 	}
 
 	@Test
 	public void handlesInvalidRequest() throws IOException {
+		//Input command
 		String input = "INVALID key\r\n";
+
 		BufferedReader mockReader = new BufferedReader(new StringReader(input));
+
 		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(input.getBytes()));
 		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
 		clientHandler.run();
