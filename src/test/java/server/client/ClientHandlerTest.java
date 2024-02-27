@@ -3,6 +3,8 @@ package server.client;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import server.requests.RequestQueue;
+import server.requests.SetRequest;
 
 import java.io.*;
 import java.net.Socket;
@@ -62,11 +64,13 @@ public class ClientHandlerTest {
 	@Test
 	public void handlesSetRequestCorrectly() throws IOException {
 		String input = "set key 5\r\nvalue\r\n";
-		mockReader = new BufferedReader(new StringReader(input));
+		String exit = "exit";
+		mockReader = new BufferedReader(new StringReader(input+exit));
 		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(input.getBytes()));
 		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
 		clientHandler.run();
-		assertEquals("STORED\r\n", mockOutputStream.toString());
+		while(!clientHandler.isHandlerRunning())
+			assertEquals(RequestQueue.retrieveRequest(),(new SetRequest("key", 0, 5, "value")));
 	}
 
 	@Test

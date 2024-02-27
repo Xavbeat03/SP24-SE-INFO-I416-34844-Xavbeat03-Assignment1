@@ -1,5 +1,7 @@
 package server.requests;
 
+import server.client.Client;
+
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 
@@ -22,7 +24,10 @@ public class RequestQueue{
 	 *
 	 * @param r the request to add to the queue
 	 */
-	public static synchronized void addRequest(Request r){requests.add(r);}
+	public static synchronized void addRequest(Request r){
+		requests.add(r);
+		Client.getClientById(r.getClientId()).getClientHandler().setRequestProcessing(false);
+	}
 
 	/**
 	 * Retrieves and removes the next request from the RequestQueue.

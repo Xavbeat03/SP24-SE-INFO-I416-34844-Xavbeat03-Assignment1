@@ -13,12 +13,16 @@ import static server.requests.RequestType.SET;
 
 
 public class ClientHandler extends Thread{
-	Socket socket;
-	Client client;
+	private Socket socket;
+	private Client client;
 
-	PrintWriter out = null;
+	private PrintWriter out = null;
 
-	String latestMessage = "";
+	private boolean isRunning = false;
+
+	private boolean requestProcessing = false;
+
+	private String latestMessage = "";
 
 	public ClientHandler(Socket clientSocket) {
 		this.socket = clientSocket;
@@ -38,7 +42,12 @@ public class ClientHandler extends Thread{
 		return this.client;
 	}
 
+	public boolean isHandlerRunning(){
+		return isRunning;
+	}
+
 	public void run() {
+		isRunning = true;
 		BufferedReader in = null;
 
 		try {
@@ -52,10 +61,12 @@ public class ClientHandler extends Thread{
 				}
 				String input = in.readLine();
 				if (input.equals("exit")) {
+					isRunning = false;
 					break;
 				}
 				if (RequestType.checkIfStringIsRequestType(input.split(" ")[0].toUpperCase())) {
 					String[] strings = input.split(" ");
+
 					switch(RequestType.convertStringToRequestType(strings[0].toUpperCase())){
 						case SET -> {
 							String line1 = input;
@@ -64,27 +75,31 @@ public class ClientHandler extends Thread{
 							if (!RequestType.checkIfStringMatchesRegex(combinedLines, RequestType.SET)) continue;
 							String[] lines = line1.split(" ");
 							String[] lines2 = line2.split(" ");
-							SetRequest setRequest = new SetRequest(lines[0], client.getId(), Integer.parseInt(lines[1]), lines2[0]);
+							SetRequest setRequest = new SetRequest(lines[1], client.getId(), Integer.parseInt(lines[2]), lines2[0]);
+							requestProcessing = true;
 							RequestQueue.addRequest(setRequest);
 						}
 
 						case GET -> {
 							if (!RequestType.checkIfStringMatchesRegex(input,GET)) continue;
 							GetRequest getRequest = new GetRequest(strings[1], client.getId());
+							requestProcessing = true;
 							RequestQueue.addRequest(getRequest);
 						}
 					}
+					while(requestProcessing) Thread.sleep(300);
 				}
 
 
 
 			}
-
+			isRunning = false;
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} finally {
+			isRunning = false;
 			try {
 				if (out != null) out.close();
 				if (in != null) {
@@ -104,6 +119,10 @@ public class ClientHandler extends Thread{
 	 */
 	public Socket getSocket() {
 		return this.socket;
+	}
+
+	public void setRequestProcessing(boolean requestProcessing){
+		this.requestProcessing = requestProcessing;
 	}
 
 	/**
