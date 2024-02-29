@@ -7,11 +7,12 @@ public class RequestFulfiller extends Thread{
 
     @Override
     public void run() {
-
-        // while there are requests to fulfill
-        while(!RequestQueue.isNoRequests()){
+        // Start looping
+        while(true){
             // get the next request
             Request r = RequestQueue.retrieveRequest();
+            //break if null request
+            if (r == null) break;
             // fulfill the request
             fulfillRequest(r);
         }

@@ -70,6 +70,9 @@ public class Server{
      * @throws IOException if an I/O error occurs when accepting a connection
      */
     private void run(ServerSocket s, RequestFulfiller requestFulfiller) throws IOException {
+        // start handling requests
+        requestFulfiller.start();
+
         // running infinite loop for getting
         // client request
         while (true) {
@@ -90,9 +93,6 @@ public class Server{
                     Client c = new Client(t);
 
                     t.start();
-
-                    // start handling requests
-                    if(!RequestQueue.isNoRequests()) requestFulfiller.start();
 
                     // Decrement the active connections counter when a client disconnects
                     for(Client client : Client.getClientMap().values()) {

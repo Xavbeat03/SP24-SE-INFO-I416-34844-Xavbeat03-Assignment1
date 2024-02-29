@@ -1,5 +1,6 @@
 package server.client;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -70,7 +71,9 @@ public class ClientHandlerTest {
 		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
 		clientHandler.run();
 		while(!clientHandler.isHandlerRunning())
-			assertEquals(RequestQueue.retrieveRequest(),(new SetRequest("key", 0, 5, "value")));
+        {
+            assertEquals(RequestQueue.retrieveRequest(), (new SetRequest("key", 0, 5, "value")));
+        }
 	}
 
 	@Test

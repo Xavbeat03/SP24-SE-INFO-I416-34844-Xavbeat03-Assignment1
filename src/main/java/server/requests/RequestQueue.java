@@ -1,9 +1,11 @@
 package server.requests;
 
+import org.jetbrains.annotations.NotNull;
 import server.client.Client;
 
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
+import java.util.concurrent.*;
 
 /**
  * This class represents a queue for holding requests in the server-client architecture.
@@ -11,7 +13,12 @@ import java.util.PriorityQueue;
  * This class is implemented as a singleton, meaning there can only be one instance of this class in the application.
  */
 public class RequestQueue{
-	private static final PriorityQueue<Request> requests = new PriorityQueue<>();
+	private static final BlockingQueue<Request> requests = new ArrayBlockingQueue<>(20, true);
+
+	private static final ExecutorService putExecutor = Executors.newSingleThreadExecutor();
+	private static final ExecutorService retrieveExecutor = Executors.newSingleThreadExecutor();
+
+	static private final Object obj = new Object();
 
 	/**
 	 * Private constructor to prevent instantiation of this class.
@@ -19,45 +26,47 @@ public class RequestQueue{
 	private RequestQueue(){}
 
 	/**
-	 * Adds a request to the RequestQueue.
-	 * The request is added to the PriorityQueue, which automatically sorts the requests based on their priority.
+	 * Shuts down the internal thread executor service
+	 */
+	public static synchronized void shutdownExecutor(){
+		putExecutor.submit(putExecutor::shutdown);
+		retrieveExecutor.submit(retrieveExecutor::shutdown);
+	}
+
+	/**
+	 * Offers up the next request to be retrieved
 	 *
-	 * @param r the request to add to the queue
+	 * @param r the request being offered
 	 */
 	public static synchronized void addRequest(Request r){
-		requests.add(r);
-		Client.getClientById(r.getClientId()).getClientHandler().setRequestProcessing(false);
+		putExecutor.submit(()-> {
+            try {
+				synchronized (obj){
+					obj.notify();
+				}
+                requests.put(r);
+            } catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+                throw new RuntimeException("Request Interrupted");
+            }
+        });
 	}
 
 	/**
-	 * Retrieves and removes the next request from the RequestQueue.
-	 * If the queue is empty, this method will throw a NoSuchElementException.
+	 * Retrieves the currently offered item from the queue
 	 *
-	 * @return the next request in the queue
+	 * @return the request being retrieved
 	 */
-	public static synchronized Request retrieveRequest(){
-		if(isNoRequests()) throw new NoSuchElementException("Illegal state invoked by retrieving from empty queue.");
-		return requests.remove();
-	}
-
-	/**
-	 * Returns the number of requests currently in the RequestQueue.
-	 *
-	 * @return the size of the Request Queue
-	 */
-	public static synchronized int getRequestQueueLength() {return requests.size();}
-
-	/**
-	 * Returns whether the RequestQueue is empty.
-	 *
-	 * @return true if the RequestQueue is empty, false otherwise
-	 */
-	public static synchronized boolean isNoRequests() {return requests.isEmpty();}
-
-	/**
-	 * Clears the queue, mainly intended for testing.
-	 */
-	public static synchronized void clearQueue() {
-		requests.clear();
-	}
+	public static synchronized Request retrieveRequest() {
+		try {
+			synchronized (obj){
+				try {
+					obj.wait();
+				} catch (Exception e){}
+			}
+			return requests.take();
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+    }
 }
