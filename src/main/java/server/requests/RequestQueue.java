@@ -5,6 +5,7 @@ import server.client.Client;
 
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.concurrent.*;
 
 /**
@@ -13,7 +14,7 @@ import java.util.concurrent.*;
  * This class is implemented as a singleton, meaning there can only be one instance of this class in the application.
  */
 public class RequestQueue{
-	private static final BlockingQueue<Request> requests = new ArrayBlockingQueue<>(20, true);
+	private static final ArrayBlockingQueue<Request> requests = new ArrayBlockingQueue<>(100, true);
 
 	private static final ExecutorService putExecutor = Executors.newSingleThreadExecutor();
 	private static final ExecutorService retrieveExecutor = Executors.newSingleThreadExecutor();
@@ -38,18 +39,15 @@ public class RequestQueue{
 	 *
 	 * @param r the request being offered
 	 */
-	public static synchronized void addRequest(Request r){
-		putExecutor.submit(()-> {
-            try {
-				synchronized (obj){
-					obj.notify();
-				}
-                requests.put(r);
-            } catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-                throw new RuntimeException("Request Interrupted");
-            }
-        });
+	public static void addRequest(Request r) {
+		try {
+			while (requests.remainingCapacity() == 0) {
+				Thread.sleep(250);
+			}
+			requests.add(r);
+		} catch(InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -57,16 +55,11 @@ public class RequestQueue{
 	 *
 	 * @return the request being retrieved
 	 */
-	public static synchronized Request retrieveRequest() {
-		try {
-			synchronized (obj){
-				try {
-					obj.wait();
-				} catch (Exception e){}
-			}
-			return requests.take();
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
+	public static synchronized Request retrieveRequest() throws InterruptedException {
+		Request r = requests.take();
+		if (Client.getClientById(r.getClientId()) != null){
+			Client.getClientById(r.getClientId()).getClientHandler().notify();
 		}
+		return r;
     }
 }

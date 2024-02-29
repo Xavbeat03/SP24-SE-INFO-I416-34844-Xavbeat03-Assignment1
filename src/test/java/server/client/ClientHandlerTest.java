@@ -70,10 +70,21 @@ public class ClientHandlerTest {
 		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(input.getBytes()));
 		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
 		clientHandler.run();
-		while(!clientHandler.isHandlerRunning())
-        {
-            assertEquals(RequestQueue.retrieveRequest(), (new SetRequest("key", 0, 5, "value")));
-        }
+
+		try {
+			clientHandler.wait();
+		} catch (InterruptedException i){
+			Thread.currentThread().interrupt();
+			i.printStackTrace();
+		}
+
+		try {
+			assertEquals(RequestQueue.retrieveRequest(), (new SetRequest("key", 0, 5, "value")));
+		} catch (InterruptedException i){
+			Thread.currentThread().interrupt();
+			i.printStackTrace();
+		}
+
 	}
 
 	@Test

@@ -14,8 +14,14 @@ public class RequestQueueTest {
 	@Test
 	void shouldAddRequestToQueue() {
 		Request request = new SetRequest("key1", 1, 5, "value1");
+        Request r2 = null;
         RequestQueue.addRequest(request);
-        Request r2 = RequestQueue.retrieveRequest();
+        try {
+            r2 = RequestQueue.retrieveRequest();
+        } catch (InterruptedException i) {
+            Thread.currentThread().interrupt();
+            i.printStackTrace();
+        }
         Assertions.assertEquals(request, r2);
         RequestQueue.shutdownExecutor();
     }
@@ -28,10 +34,15 @@ public class RequestQueueTest {
         RequestQueue.addRequest(request);
         RequestQueue.addRequest(request2);
         RequestQueue.addRequest(request3);
-        Request r2 = RequestQueue.retrieveRequest();
-        r2 = RequestQueue.retrieveRequest();
-        r2 = RequestQueue.retrieveRequest();
-        Assertions.assertEquals(request3, r2);
+        try {
+            Request r2 = RequestQueue.retrieveRequest();
+            r2 = RequestQueue.retrieveRequest();
+            r2 = RequestQueue.retrieveRequest();
+            Assertions.assertEquals(request3, r2);
+        } catch (InterruptedException i){
+            i.printStackTrace();
+        }
         RequestQueue.shutdownExecutor();
+
     }
 }

@@ -9,8 +9,14 @@ public class RequestFulfiller extends Thread{
     public void run() {
         // Start looping
         while(true){
+            Request r = null;
             // get the next request
-            Request r = RequestQueue.retrieveRequest();
+            try {
+                r = RequestQueue.retrieveRequest();
+            } catch (InterruptedException i){
+                Thread.currentThread().interrupt();
+                i.printStackTrace();
+            }
             //break if null request
             if (r == null) break;
             // fulfill the request
