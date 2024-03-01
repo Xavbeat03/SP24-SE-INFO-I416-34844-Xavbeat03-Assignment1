@@ -44,7 +44,8 @@ public class RequestQueue{
 			while (requests.remainingCapacity() == 0) {
 				Thread.sleep(250);
 			}
-			requests.add(r);
+			putExecutor.submit(() -> requests.add(r));
+
 		} catch(InterruptedException e) {
 			e.printStackTrace();
 		}

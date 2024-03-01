@@ -36,7 +36,9 @@ public class RequestQueueTest {
         RequestQueue.addRequest(request3);
         try {
             Request r2 = RequestQueue.retrieveRequest();
+            Assertions.assertEquals(request, r2);
             r2 = RequestQueue.retrieveRequest();
+            Assertions.assertEquals(request2, r2);
             r2 = RequestQueue.retrieveRequest();
             Assertions.assertEquals(request3, r2);
         } catch (InterruptedException i){

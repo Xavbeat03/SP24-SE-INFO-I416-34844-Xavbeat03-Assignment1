@@ -68,22 +68,19 @@ public class ClientHandlerTest {
 		String exit = "exit";
 		mockReader = new BufferedReader(new StringReader(input+exit));
 		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(input.getBytes()));
-		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
+  		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
+
 		clientHandler.run();
 
-		try {
-			clientHandler.wait();
-		} catch (InterruptedException i){
-			Thread.currentThread().interrupt();
-			i.printStackTrace();
-		}
-
+		boolean b = false;
 		try {
 			assertEquals(RequestQueue.retrieveRequest(), (new SetRequest("key", 0, 5, "value")));
+			b = true;
 		} catch (InterruptedException i){
 			Thread.currentThread().interrupt();
 			i.printStackTrace();
 		}
+		if(!b) Assertions.fail();
 
 	}
 
@@ -119,4 +116,5 @@ public class ClientHandlerTest {
 		clientHandler.run();
 		assertEquals("", mockOutputStream.toString());
 	}
+
 }
