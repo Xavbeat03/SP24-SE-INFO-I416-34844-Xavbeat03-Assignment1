@@ -70,7 +70,7 @@ public class ClientHandlerTest {
 		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(input.getBytes()));
   		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
 
-		clientHandler.run();
+		clientHandler.start();
 
 		boolean b = false;
 		try {
@@ -90,7 +90,7 @@ public class ClientHandlerTest {
 		BufferedReader mockReader = new BufferedReader(new StringReader(input));
 		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(input.getBytes()));
 		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
-		clientHandler.run();
+		clientHandler.start();
 		assertEquals("value key 5 \r\nvalue\r\nEND\r\n", mockOutputStream.toString());
 	}
 
@@ -103,7 +103,7 @@ public class ClientHandlerTest {
 
 		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(input.getBytes()));
 		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
-		clientHandler.run();
+		clientHandler.start();
 		assertEquals("", mockOutputStream.toString());
 	}
 
@@ -113,7 +113,7 @@ public class ClientHandlerTest {
 		BufferedReader mockReader = new BufferedReader(new StringReader(input));
 		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(input.getBytes()));
 		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
-		clientHandler.run();
+		clientHandler.start();
 		assertEquals("", mockOutputStream.toString());
 	}
 
