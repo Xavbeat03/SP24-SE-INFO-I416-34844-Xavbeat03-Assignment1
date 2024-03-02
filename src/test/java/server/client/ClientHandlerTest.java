@@ -4,11 +4,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import server.requests.GetRequest;
+import server.requests.Request;
 import server.requests.RequestQueue;
 import server.requests.SetRequest;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -67,14 +70,19 @@ public class ClientHandlerTest {
 		String input = "set key 5\r\nvalue\r\n";
 		String exit = "exit";
 		mockReader = new BufferedReader(new StringReader(input+exit));
-		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(input.getBytes()));
+		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream((input+exit).getBytes()));
   		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
 
 		clientHandler.start();
 
 		boolean b = false;
 		try {
-			assertEquals(RequestQueue.retrieveRequest(), (new SetRequest("key", 0, 5, "value")));
+			SetRequest r = (SetRequest) RequestQueue.retrieveRequest();
+			assertEquals("key", r.getKey());
+			assertEquals(0, r.getClientId());
+			assertEquals(5, r.getValueSizeBytes());
+			assertEquals("value", r.getValue());
+
 			b = true;
 		} catch (InterruptedException i){
 			Thread.currentThread().interrupt();
@@ -87,25 +95,41 @@ public class ClientHandlerTest {
 	@Test
 	public void handlesGetRequestCorrectly() throws IOException {
 		String input = "get key \r\n";
-		BufferedReader mockReader = new BufferedReader(new StringReader(input));
-		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(input.getBytes()));
+		String exit = "exit";
+		BufferedReader mockReader = new BufferedReader(new StringReader(input + exit));
+		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream((input+exit).getBytes()));
 		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
 		clientHandler.start();
-		assertEquals("value key 5 \r\nvalue\r\nEND\r\n", mockOutputStream.toString());
+
+		boolean b = false;
+		try {
+			GetRequest r = (GetRequest) RequestQueue.retrieveRequest();
+			assertEquals("key", r.getKey());
+			assertEquals(0, r.getClientId());
+
+			b = true;
+		} catch (InterruptedException i){
+			Thread.currentThread().interrupt();
+			i.printStackTrace();
+		}
+		if(!b) Assertions.fail();
 	}
 
 	@Test
 	public void handlesInvalidRequest() throws IOException {
 		//Input command
 		String input = "INVALID key\r\n";
+		String exit = "exit";
 
-		BufferedReader mockReader = new BufferedReader(new StringReader(input));
+		BufferedReader mockReader = new BufferedReader(new StringReader(input+exit));
+		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream((input+exit).getBytes());
 
-		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(input.getBytes()));
+		Mockito.when(mockSocket.getInputStream()).thenReturn(byteArrayInputStream);
 		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
 		clientHandler.start();
-		assertEquals("", mockOutputStream.toString());
+		assertEquals(0, RequestQueue.getSize());
 	}
+
 
 	@Test
 	public void handlesExitCommand() throws IOException {

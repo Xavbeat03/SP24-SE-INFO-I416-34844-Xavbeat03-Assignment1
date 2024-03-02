@@ -57,10 +57,16 @@ public class RequestQueue{
 	 * @return the request being retrieved
 	 */
 	public static synchronized Request retrieveRequest() throws InterruptedException {
-		Request r = requests.take();
-		if (Client.getClientById(r.getClientId()) != null){
-			Client.getClientById(r.getClientId()).getClientHandler().notify();
-		}
-		return r;
-    }
+		return requests.take();
+	}
+
+	/**
+	 * Gets the size of the array
+	 *
+	 * @return the size of the array
+	 */
+	public static synchronized int getSize() {
+		return requests.size();
+	}
+
 }
