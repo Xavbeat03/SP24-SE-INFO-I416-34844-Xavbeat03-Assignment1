@@ -87,9 +87,9 @@ public class ClientHandlerTest {
 		} catch (InterruptedException i){
 			Thread.currentThread().interrupt();
 			i.printStackTrace();
+		} finally {
+			if (!b) Assertions.fail();
 		}
-		if(!b) Assertions.fail();
-
 	}
 
 	@Test

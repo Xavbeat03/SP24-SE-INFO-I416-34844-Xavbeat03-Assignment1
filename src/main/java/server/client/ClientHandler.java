@@ -84,7 +84,9 @@ public class ClientHandler extends Thread{
 						}
 
 						case GET -> {
-							if (!RequestType.checkIfStringMatchesRegex(input,GET)) continue;
+							String line = input + " \r\n";
+							System.out.println(RequestType.checkIfStringMatchesRegex(line,GET));
+							if (!RequestType.checkIfStringMatchesRegex(line,GET)) continue;
 							GetRequest getRequest = new GetRequest(strings[1], client.getId());
 							requestProcessing = true;
 							RequestQueue.addRequest(getRequest);
