@@ -14,6 +14,7 @@ import java.net.Socket;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class ClientHandlerTest {
 
@@ -71,7 +72,6 @@ public class ClientHandlerTest {
 		String exit = "exit";
 		mockReader = new BufferedReader(new StringReader(input+exit));
 		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream((input+exit).getBytes()));
-  		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
 
 		clientHandler.start();
 
@@ -98,7 +98,7 @@ public class ClientHandlerTest {
 		String exit = "exit";
 		BufferedReader mockReader = new BufferedReader(new StringReader(input + exit));
 		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream((input+exit).getBytes()));
-		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
+
 		clientHandler.start();
 
 		boolean b = false;
@@ -125,7 +125,7 @@ public class ClientHandlerTest {
 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream((input+exit).getBytes());
 
 		Mockito.when(mockSocket.getInputStream()).thenReturn(byteArrayInputStream);
-		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
+
 		clientHandler.start();
 		assertEquals(0, RequestQueue.getSize());
 	}
@@ -136,9 +136,10 @@ public class ClientHandlerTest {
 		String input = "exit\r\n";
 		BufferedReader mockReader = new BufferedReader(new StringReader(input));
 		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream(input.getBytes()));
-		Mockito.when(mockReader.readLine()).thenCallRealMethod(); // Call the real readLine() method
+
 		clientHandler.start();
-		assertEquals("", mockOutputStream.toString());
+
+		assertFalse(clientHandler.isHandlerRunning());
 	}
 
 }
