@@ -95,8 +95,6 @@ public class ClientHandler extends Thread{
 					while(requestProcessing) Thread.sleep(300);
 				}
 
-
-
 			}
 			isRunning = false;
 		} catch (IOException e) {

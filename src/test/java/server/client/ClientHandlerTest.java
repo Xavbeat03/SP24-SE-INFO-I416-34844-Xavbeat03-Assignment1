@@ -94,7 +94,7 @@ public class ClientHandlerTest {
 
 	@Test
 	public void handlesGetRequestCorrectly() throws IOException {
-		String input = "get key \r\n";
+		String input = "get key\r\n";
 		String exit = "exit";
 		BufferedReader mockReader = new BufferedReader(new StringReader(input + exit));
 		Mockito.when(mockSocket.getInputStream()).thenReturn(new ByteArrayInputStream((input+exit).getBytes()));
