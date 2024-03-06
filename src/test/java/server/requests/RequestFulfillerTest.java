@@ -37,7 +37,20 @@ public class RequestFulfillerTest {
 		SetRequest request = new SetRequest("key", 1, 4, "value");
 		RequestQueue.addRequest(request);
 		requestFulfiller.start();
-		Assertions.assertEquals("STORED\r\n", clientHandler.getLatestMessage());
+		while(requestFulfiller.isFulfillingRequest()){
+			try {
+				Thread.sleep(250);
+			} catch (InterruptedException i){
+				i.printStackTrace();
+			}
+		}
+
+		if(clientHandler.getLatestMessage().equals("STORED\r\n")) {
+			Assertions.assertTrue(true);
+			return;
+		}
+
+		Assertions.fail("Failed to get the Latest Message in a reasonable time period.");
 	}
 
 	@Test
