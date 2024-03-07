@@ -34,6 +34,7 @@ public class ClientHandler extends Thread{
         while (true)
         {
             try {
+                // TODO Look for GET and SET Commands
 
                 // Ask user what he wants
                 dos.writeUTF("What do you want?[Date | Time]..\n"+

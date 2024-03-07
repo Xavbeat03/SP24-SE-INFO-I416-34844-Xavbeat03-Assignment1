@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
  * This class provides static methods to handle file operations.
  */
 public class FileHandler {
+    // TODO Properly implement the queue
 
     // The path to the file
     private static String filePath = "./data/map.txt";

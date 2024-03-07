@@ -13,6 +13,7 @@ public class Server{
     private static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
+
         int i = 0;
         // server is listening on port 5056
         ServerSocket ss = new ServerSocket(5056);
@@ -52,7 +53,7 @@ public class Server{
         }
     }
 
-    /**
+    /**a
      * Adds handler c to the handler list
      * @param c the handler to be added
      */
