@@ -14,23 +14,31 @@ public class ClientHandler extends Thread{
     final DataInputStream dis;
     final DataOutputStream dos;
     final Socket s;
+    final int id;
 
     // Constructor
-    public ClientHandler(Socket s, DataInputStream dis, DataOutputStream dos)
+    public ClientHandler(Socket s, DataInputStream dis, DataOutputStream dos, int id)
     {
         this.s = s;
         this.dis = dis;
         this.dos = dos;
+        this.id = id;
     }
 
     @Override
     public void run()
     {
+        Server.addHandler(this);
         String received;
         String toreturn;
         while (true)
         {
             try {
+
+                // Ask user what he wants
+                dos.writeUTF("What do you want?[Date | Time]..\n"+
+                        "Type Exit to terminate connection.");
+
 
                 // receive the answer from client
                 received = dis.readUTF();
@@ -41,6 +49,8 @@ public class ClientHandler extends Thread{
                     System.out.println("Closing this connection.");
                     this.s.close();
                     System.out.println("Connection closed");
+                    Server.removeHandler(this);
+                    System.out.println(Server.getHandlers().size());
                     break;
                 }
 
@@ -75,10 +85,19 @@ public class ClientHandler extends Thread{
             // closing resources
             this.dis.close();
             this.dos.close();
+            Server.removeHandler(this);
 
         }catch(IOException e){
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Gets the ID of the handler
+     * @return integer representing the id.
+     */
+    public int getHandlerId() {
+        return id;
     }
 
 }
