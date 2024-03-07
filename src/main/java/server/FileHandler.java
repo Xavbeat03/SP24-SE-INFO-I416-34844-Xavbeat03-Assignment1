@@ -14,6 +14,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class FileHandler {
     // TODO Properly implement the queue
+    // TODO Figure out how information is properly returned to the ClientHandler
+
+    // Some kind of wait until the receive or wait until the info is returned?
 
     // The path to the file
     private static String filePath = "./data/map.txt";
