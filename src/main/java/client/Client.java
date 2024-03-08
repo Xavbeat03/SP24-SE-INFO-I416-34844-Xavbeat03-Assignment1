@@ -34,7 +34,6 @@ public class Client
                 String tosend = scn.nextLine();
                 dos.writeUTF(tosend);
                 if(tosend.split(" ")[0].equals("set")){
-                    //TODO add a check that makes sure value-size-bytes = value length
                     tosend = scn.nextLine();
                     dos.writeUTF(tosend);
                 }

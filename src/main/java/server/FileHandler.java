@@ -18,6 +18,8 @@ public class FileHandler {
 
     // TODO Figure out how information is properly returned to the ClientHandler
 
+    // TODO Return information via Return statement
+
     // Some kind of wait until the receive or wait until the info is returned?
 
     // The path to the file

@@ -67,7 +67,8 @@ public class ClientHandler extends Thread{
 
                     case "set" :
 
-
+                        String value = dis.readUTF();
+                        
                         toreturn = fordate.format(date);
                         dos.writeUTF(toreturn);
                         break;
