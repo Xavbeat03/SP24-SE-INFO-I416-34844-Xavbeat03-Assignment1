@@ -34,6 +34,7 @@ public class ClientHandler extends Thread{
         while (true)
         {
             try {
+
                 // TODO Look for GET and SET Commands
 
                 // Ask user what he wants
@@ -58,16 +59,21 @@ public class ClientHandler extends Thread{
                 // creating Date object
                 Date date = new Date();
 
+                String[] items = received.split(" ");
+
                 // write on output stream based on the
                 // answer from the client
-                switch (received) {
+                switch (items[0]) {
 
-                    case "Date" :
+                    case "set" :
+
+
                         toreturn = fordate.format(date);
                         dos.writeUTF(toreturn);
                         break;
 
-                    case "Time" :
+                    case "get" :
+
                         toreturn = fortime.format(date);
                         dos.writeUTF(toreturn);
                         break;

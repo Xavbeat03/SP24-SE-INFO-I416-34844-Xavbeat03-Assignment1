@@ -33,6 +33,11 @@ public class Client
                 System.out.println(dis.readUTF());
                 String tosend = scn.nextLine();
                 dos.writeUTF(tosend);
+                if(tosend.split(" ")[0].equals("set")){
+                    //TODO add a check that makes sure value-size-bytes = value length
+                    tosend = scn.nextLine();
+                    dos.writeUTF(tosend);
+                }
 
                 // If client sends exit,close this connection
                 // and then break from the while loop
