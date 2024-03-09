@@ -56,9 +56,6 @@ public class ClientHandler extends Thread{
                     break;
                 }
 
-                // creating Date object
-                Date date = new Date();
-
                 String[] items = received.split(" ");
 
                 // write on output stream based on the
@@ -66,16 +63,22 @@ public class ClientHandler extends Thread{
                 switch (items[0]) {
 
                     case "set" :
-
+                        if(items.length==1) dos.writeUTF("Invalid input");
                         String value = dis.readUTF();
-                        
-                        toreturn = fordate.format(date);
+                        FileHandler.SetRequest s = new FileHandler.SetRequest(items[1], String.valueOf(value.length()));
+                        FileHandler.addRequest(s);
+                        toreturn = FileHandler.handleRequest(s);
+
                         dos.writeUTF(toreturn);
                         break;
 
                     case "get" :
+                        if(items.length==1) dos.writeUTF("Invalid input");
 
-                        toreturn = fortime.format(date);
+                        FileHandler.GetRequest g = new FileHandler.GetRequest(items[1]);
+                        FileHandler.addRequest(g);
+                        toreturn = FileHandler.handleRequest(g);
+
                         dos.writeUTF(toreturn);
                         break;
 

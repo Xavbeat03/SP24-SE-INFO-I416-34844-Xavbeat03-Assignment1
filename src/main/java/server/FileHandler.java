@@ -29,19 +29,16 @@ public class FileHandler {
     // A flag to indicate whether the class is in testing mode
     private static boolean testingMode = false;
 
-    private BlockingQueue<Request> requestBlockingQueue = new ArrayBlockingQueue<>(30, true);
+    private static BlockingQueue<Request> requestBlockingQueue = new ArrayBlockingQueue<>(30, true);
 
-    private abstract class Request{
+    private static abstract class Request{
         public abstract String getKey() ;
 
-        public abstract int getId() ;
     }
 
-    public class GetRequest extends Request{
-        private int id;
+    public static class GetRequest extends Request{
         private String key;
-        public GetRequest(String Key, int id){
-            this.id = id;
+        public GetRequest(String Key){
             this.key = Key;
         }
 
@@ -49,17 +46,12 @@ public class FileHandler {
             return key;
         }
 
-        public int getId() {
-            return id;
-        }
     }
 
-    public class SetRequest extends Request{
-        private int id;
+    public static class SetRequest extends Request{
         private String key;
         private String value;
-        public SetRequest(String Key, String value, int id){
-            this.id = id;
+        public SetRequest(String Key, String value){
             this.key = Key;
             this.value = value;
         }
@@ -72,9 +64,56 @@ public class FileHandler {
             return value;
         }
 
-        public int getId() {
-            return id;
+    }
+
+    /**
+     * Adds a request to the queue
+     * @param r the request to add to the queue
+     */
+    public static void addRequest(Request r){
+        requestBlockingQueue.add(r);
+    }
+
+    public static String handleRequest(Request r){
+        while(true) {
+            if (requestBlockingQueue.peek().equals(r)) {
+                try {
+                    Request e = requestBlockingQueue.take();
+                    if(e instanceof SetRequest s){
+
+                        if (storeValue((s).key, (s).value)){
+                            return "STORED\r\nEND\r\n";
+                        } else {
+                            return "NOT-STORED\r\nEND\r\n";
+                        }
+
+                    } else if (e instanceof GetRequest g){
+                        String[] values = getValue(g.key);
+                        if(values.length == 2){
+                            return "VALUE %s %d \r\n%s\r\nEND\r\n".formatted(values[0], values[1].length(), values[1]);
+                        } else if(values.length == 1) {
+                            return "VALUE %s 0\r\n\r\nEND\r\n".formatted(values[0]);
+                        } else {
+                            return "END\r\n";
+                        }
+                    } else {
+                        throw new IllegalArgumentException("Request r was of an illegal request type");
+                    }
+                } catch (InterruptedException i) {
+                     Thread.currentThread().interrupt();
+                     i.printStackTrace();
+                     continue;
+                }
+
+            }
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException i) {
+                Thread.currentThread().interrupt();
+                i.printStackTrace();
+            }
         }
+
     }
 
     /**
@@ -85,7 +124,7 @@ public class FileHandler {
      * @param value The value to be stored
      * @param key The key associated with the value
      */
-    public static synchronized void storeValue(String value, String key){
+    private static synchronized boolean storeValue(String value, String key){
         if(value.isEmpty() || key.isEmpty()) throw new IllegalArgumentException("Key or Value is empty.");
         sleepForRandomShortDuration();
         try(BufferedReader fileReader = new BufferedReader(new FileReader(getFilePath()))){
@@ -103,11 +142,13 @@ public class FileHandler {
                 totalFile.append("%s,%s%n".formatted(key, value));
             }
             writeFile(String.valueOf(totalFile));
+            return true;
         } catch (IOException e){
             e.printStackTrace();
+            return false;
         }
 
-    }
+	}
 
     /**
      * This method writes a string to the file.
@@ -129,7 +170,7 @@ public class FileHandler {
      * @param key The key whose associated value is to be returned
      * @return The value associated with the key, or an empty array if the key is not found
      */
-    public static synchronized String[] getValue(String key){
+    private static synchronized String[] getValue(String key){
         sleepForRandomShortDuration();
         try(BufferedReader fileReader = new BufferedReader(new FileReader(getFilePath()))){
             String line = fileReader.readLine();
@@ -148,14 +189,14 @@ public class FileHandler {
      *
      * @return The file path
      */
-    public static String getFilePath(){return filePath;}
+    private static String getFilePath(){return filePath;}
 
     /**
      * This method sets the file path.
      *
      * @param filePath1 The new file path
      */
-    public static void setFilePath(String filePath1) {
+    private static void setFilePath(String filePath1) {
         filePath = filePath1;
     }
 

@@ -22,6 +22,12 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    implementation("org.junit.jupiter:junit-jupiter:5.8.2")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.10.0")
+    testImplementation ("org.mockito:mockito-core:3.12.4")
+}
+
 // Java version 17
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -39,6 +45,11 @@ sourceSets {
         }
         kotlin {
             srcDir("src/main/kotlin")
+        }
+    }
+    test {
+        java {
+            srcDirs("src/test/java")
         }
     }
 }
@@ -114,6 +125,10 @@ tasks {
     // Disables ./gradlew build from producing its own jar
     named("jar"){
         enabled = false
+    }
+
+    test {
+        useJUnitPlatform()
     }
 
 
