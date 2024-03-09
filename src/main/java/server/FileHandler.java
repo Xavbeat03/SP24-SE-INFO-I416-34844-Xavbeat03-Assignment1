@@ -1,9 +1,6 @@
 package server;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -81,7 +78,7 @@ public class FileHandler {
                     Request e = requestBlockingQueue.take();
                     if(e instanceof SetRequest s){
 
-                        if (storeValue((s).key, (s).value)){
+                        if (storeValue(s.value, s.key)){
                             return "STORED\r\nEND\r\n";
                         } else {
                             return "NOT-STORED\r\nEND\r\n";
@@ -127,6 +124,15 @@ public class FileHandler {
     private static synchronized boolean storeValue(String value, String key){
         if(value.isEmpty() || key.isEmpty()) throw new IllegalArgumentException("Key or Value is empty.");
         sleepForRandomShortDuration();
+        File file = new File(getFilePath());
+        if (!file.exists()){
+            try{
+                file.createNewFile();
+            } catch (IOException i){
+
+            }
+
+        }
         try(BufferedReader fileReader = new BufferedReader(new FileReader(getFilePath()))){
             String line = fileReader.readLine();
             StringBuilder totalFile = new StringBuilder();
