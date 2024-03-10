@@ -32,3 +32,4 @@ build
 # Ignore intellij project files
 .idea
 *.gradle.xml
+ip.txt
