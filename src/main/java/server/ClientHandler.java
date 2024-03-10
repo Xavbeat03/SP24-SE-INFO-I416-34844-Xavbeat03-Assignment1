@@ -35,8 +35,6 @@ public class ClientHandler extends Thread{
         {
             try {
 
-                // TODO Look for GET and SET Commands
-
                 // Ask user what he wants
                 dos.writeUTF("What do you want to do?[Get | Set]..\n"+
                         "Type Exit to terminate connection.");

@@ -129,7 +129,7 @@ public class FileHandler {
             try{
                 file.createNewFile();
             } catch (IOException i){
-
+                return false;
             }
 
         }

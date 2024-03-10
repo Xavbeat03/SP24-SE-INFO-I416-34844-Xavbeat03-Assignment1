@@ -16,8 +16,18 @@ public class Client
         {
             Scanner scn = new Scanner(System.in);
 
-            // getting localhost ip
-            InetAddress ip = InetAddress.getByName("localhost");
+            File file = new File("ip.txt");
+            String address = "localhost";
+            if(file.exists()) {
+                try {
+                    Scanner Reader = new Scanner(file);
+                    address = Reader.nextLine();
+                    Reader.close();
+                } catch (FileNotFoundException ignored) {}
+            }
+
+            // getting ip
+            InetAddress ip = InetAddress.getByName(address);
 
             // establish the connection with server port 5056
             Socket s = new Socket(ip, 5056);
