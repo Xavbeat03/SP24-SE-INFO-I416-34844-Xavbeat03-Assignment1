@@ -4,6 +4,8 @@
 
 To build the program clone the repo into a destination of your choosing then run ```./gradlew build``` within the project source directory. This should give you two resulting .jar files for both the client and server software.
 You can then run the .jar files as you see fit. From the repo you can also use ```./gradlew runServer``` or ```./gradlew runClient``` to build and run a specific .jar file.
+The clients connect over port 5056, and use either the ip localhost or the ip stated in ip.txt(may need to be created) within the rootdirectory of the project.
+
 
 ## I416 Assignment 1: Memcached-lite
 
