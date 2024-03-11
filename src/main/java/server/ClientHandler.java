@@ -58,31 +58,36 @@ public class ClientHandler extends Thread{
 
                 // write on output stream based on the
                 // answer from the client
-                switch (items[0]) {
+                if (items.length == 1) {
+                    dos.writeUTF("Invalid input");
+                } else {
+                    switch (items[0]) {
 
-                    case "set" :
-                        if(items.length==1 || items.length==2 || items.length > 3) dos.writeUTF("Invalid input");
-                        String value = dis.readUTF();
-                        FileHandler.SetRequest s = new FileHandler.SetRequest(items[1], value);
-                        FileHandler.addRequest(s);
-                        toreturn = FileHandler.handleRequest(s);
+                        case "set":
+                            if (items.length == 1 || items.length == 2 || items.length > 3)
+                                dos.writeUTF("Invalid input");
+                            String value = dis.readUTF();
+                            FileHandler.SetRequest s = new FileHandler.SetRequest(items[1], value);
+                            FileHandler.addRequest(s);
+                            toreturn = FileHandler.handleRequest(s);
 
-                        dos.writeUTF(toreturn);
-                        break;
+                            dos.writeUTF(toreturn);
+                            break;
 
-                    case "get" :
-                        if(items.length==1 || items.length > 2) dos.writeUTF("Invalid input");
+                        case "get":
+                            if (items.length == 1 || items.length > 2) dos.writeUTF("Invalid input");
 
-                        FileHandler.GetRequest g = new FileHandler.GetRequest(items[1]);
-                        FileHandler.addRequest(g);
-                        toreturn = FileHandler.handleRequest(g);
+                            FileHandler.GetRequest g = new FileHandler.GetRequest(items[1]);
+                            FileHandler.addRequest(g);
+                            toreturn = FileHandler.handleRequest(g);
 
-                        dos.writeUTF(toreturn);
-                        break;
+                            dos.writeUTF(toreturn);
+                            break;
 
-                    default:
-                        dos.writeUTF("Invalid input");
-                        break;
+                        default:
+                            dos.writeUTF("Invalid input");
+                            break;
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
