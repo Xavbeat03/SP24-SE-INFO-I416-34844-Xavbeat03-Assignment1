@@ -61,7 +61,7 @@ public class ClientHandler extends Thread{
                 switch (items[0]) {
 
                     case "set" :
-                        if(items.length==1) dos.writeUTF("Invalid input");
+                        if(items.length==1 || items.length==2 || items.length > 3) dos.writeUTF("Invalid input");
                         String value = dis.readUTF();
                         FileHandler.SetRequest s = new FileHandler.SetRequest(items[1], String.valueOf(value.length()));
                         FileHandler.addRequest(s);
@@ -71,7 +71,7 @@ public class ClientHandler extends Thread{
                         break;
 
                     case "get" :
-                        if(items.length==1) dos.writeUTF("Invalid input");
+                        if(items.length==1 || items.length > 2) dos.writeUTF("Invalid input");
 
                         FileHandler.GetRequest g = new FileHandler.GetRequest(items[1]);
                         FileHandler.addRequest(g);

@@ -11,16 +11,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class FileHandler {
 
-    // TODO Properly implement the queue
-
-    // TODO Figure out how information is properly returned to the ClientHandler
-
-    // TODO Return information via Return statement
-
     // Some kind of wait until the receive or wait until the info is returned?
 
     // The path to the file
-    private static String filePath = "./data/map.txt";
+    private static String filePath = "./map.txt";
     // Private constructor to prevent instantiation
     private FileHandler(){}
     // A flag to indicate whether the class is in testing mode
@@ -129,6 +123,7 @@ public class FileHandler {
             try{
                 file.createNewFile();
             } catch (IOException i){
+                System.out.println("Failed to create data map.");
                 return false;
             }
 
