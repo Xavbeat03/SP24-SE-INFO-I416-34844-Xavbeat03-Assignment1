@@ -2,8 +2,8 @@ val mainClassNameClient = "client.Client"
 val mainClassNameServer = "server.Server"
 val fileNameClient = "SP24-SE-INFO-I416-34844-Xavbeat03-Assignment1-Client"
 val fileNameServer = "SP24-SE-INFO-I416-34844-Xavbeat03-Assignment1-Server"
-val versionNumberClient = "0.0.1"
-val versionNumberServer = "0.0.1"
+val versionNumberClient = "0.0.2"
+val versionNumberServer = "0.0.2"
 
 val runClientArgs = "-Xms256M -Xmx512M -XX:ParallelGCThreads=2 -client -XX:CompileThreshold=1000".split(" ")
 val runServerArgs = "-Xms1G -Xmx3G -XX:ParallelGCThreads=4 -XX:MaxMetaspaceSize=512M  -XX:+HeapDumpOnOutOfMemoryError -server -XX:CompileThreshold=10000 -Xlint:-deprecation".split(" ")

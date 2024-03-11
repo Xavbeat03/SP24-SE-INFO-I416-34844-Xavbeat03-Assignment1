@@ -63,7 +63,7 @@ public class ClientHandler extends Thread{
                     case "set" :
                         if(items.length==1 || items.length==2 || items.length > 3) dos.writeUTF("Invalid input");
                         String value = dis.readUTF();
-                        FileHandler.SetRequest s = new FileHandler.SetRequest(items[1], String.valueOf(value.length()));
+                        FileHandler.SetRequest s = new FileHandler.SetRequest(items[1], value);
                         FileHandler.addRequest(s);
                         toreturn = FileHandler.handleRequest(s);
 
