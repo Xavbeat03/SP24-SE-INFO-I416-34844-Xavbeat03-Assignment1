@@ -173,6 +173,9 @@ public class FileHandler {
      */
     private static synchronized String[] getValue(String key){
         sleepForRandomShortDuration();
+        if(!(new File(getFilePath()).exists())) {
+            return new String[]{};
+        }
         try(BufferedReader fileReader = new BufferedReader(new FileReader(getFilePath()))){
             String line = fileReader.readLine();
             while(line!=null){
@@ -182,8 +185,9 @@ public class FileHandler {
         } catch (IOException e){
             e.printStackTrace();
         }
-        return new String[]{};
-    }
+
+		return new String[]{};
+	}
 
     /**
      * This method returns the file path.
